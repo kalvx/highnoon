@@ -1,369 +1,118 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>High Noon — Destination Gallery</title>
-  <style>
-    :root{
-      --bg1:#0b0705;
-      --bg2:#140c08;
-      --panel:#1b110c;
-      --bar:#2a1a12;
-      --btn:#3a2419;
-      --btn2:#4a2f21;
-      --text:#e7d7c7;
-      --muted:#b9a694;
-      --shadow: 0 10px 30px rgba(0,0,0,.45);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 600px at 50% 0%, #26160f 0%, var(--bg1) 55%, #070403 100%);
-      color:var(--text);
-      overflow:hidden;
-    }
-    header{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-      padding:10px 12px;
-      background: linear-gradient(180deg, rgba(60,36,25,.9), rgba(30,18,12,.9));
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .left{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
-    .title{
-      font-weight:700;
-      letter-spacing:.3px;
-      margin-right:6px;
-      opacity:.95;
-    }
-    .tabs{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-    button.tab{
-      border:1px solid rgba(255,255,255,.10);
-      background: linear-gradient(180deg, var(--btn2), var(--btn));
-      color:var(--text);
-      padding:7px 10px;
-      border-radius:10px;
-      cursor:pointer;
-      font-weight:600;
-      box-shadow: 0 4px 12px rgba(0,0,0,.25);
-    }
-    button.tab.active{
-      outline:2px solid rgba(231,215,199,.25);
-      filter:brightness(1.05);
-    }
-    .right{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      color:var(--muted);
-      font-size:12px;
-      white-space:nowrap;
-    }
-    .wrap{
-      height: calc(100vh - 54px);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 18px;
-      position:relative;
-    }
-    .stage{
-      width:min(980px, 96vw);
-      height:min(92vh, 820px);
-      background: linear-gradient(180deg, rgba(30,18,12,.75), rgba(20,12,8,.55));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:18px;
-      box-shadow: var(--shadow);
-      position:relative;
-      overflow:hidden;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    img#viewer{
-      max-width: 96%;
-      max-height: 92%;
-      object-fit: contain;
-      image-rendering: auto;
-      filter: drop-shadow(0 12px 30px rgba(0,0,0,.55));
-      user-select:none;
-      -webkit-user-drag:none;
-    }
-    .navBtn{
-      position:absolute;
-      top:50%;
-      transform:translateY(-50%);
-      width:46px;
-      height:46px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(40,24,16,.65);
-      backdrop-filter: blur(6px);
-      color:var(--text);
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:22px;
-    }
-    .navBtn:hover{ background: rgba(60,36,25,.75); }
-    .navBtn:active{ transform:translateY(-50%) scale(.98); }
-    #prev{ left:12px; }
-    #next{ right:12px; }
+<meta charset="UTF-8" />
+<title>High Noon – Destination Gallery</title>
 
-    .footer{
-      position:absolute;
-      left:0; right:0; bottom:0;
-      padding:10px 12px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.35));
-      pointer-events:none;
-    }
-    .pill{
-      pointer-events:none;
-      font-size:12px;
-      color:var(--muted);
-      background: rgba(0,0,0,.35);
-      border:1px solid rgba(255,255,255,.08);
-      padding:6px 10px;
-      border-radius:999px;
-      backdrop-filter: blur(6px);
-      max-width: 70%;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-    .hint{
-      pointer-events:none;
-      font-size:12px;
-      color:rgba(231,215,199,.75);
-      opacity:.9;
-    }
-  </style>
+<style>
+body {
+    margin: 0;
+    background: radial-gradient(#2b1a0f, #0f0703);
+    color: #e6c89c;
+    font-family: Georgia, serif;
+    overflow: hidden;
+}
+
+header {
+    padding: 10px;
+    text-align: center;
+}
+
+button {
+    background: #3a2617;
+    color: #e6c89c;
+    border: 1px solid #6b4a2e;
+    padding: 6px 14px;
+    margin: 4px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+button.active {
+    background: #6b4a2e;
+}
+
+#viewer {
+    position: absolute;
+    inset: 60px 0 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+}
+
+#hint {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    opacity: 0.6;
+    font-size: 12px;
+}
+</style>
 </head>
+
 <body>
-  <header>
-    <div class="left">
-      <div class="title">High Noon Gallery</div>
-      <div class="tabs" id="tabs"></div>
-    </div>
-    <div class="right" id="status">Loading…</div>
-  </header>
 
-  <div class="wrap">
-    <div class="stage" id="stage">
-      <button class="navBtn" id="prev" title="Prev">&#x2039;</button>
-      <img id="viewer" alt="card" />
-      <button class="navBtn" id="next" title="Next">&#x203A;</button>
+<header>
+    <button onclick="loadSet('base')">base</button>
+    <button onclick="loadSet('economy')">economy</button>
+    <button onclick="loadSet('killer')">killer</button>
+    <button onclick="loadSet('wanted')">wanted</button>
+</header>
 
-      <div class="footer">
-        <div class="pill" id="filename">—</div>
-        <div class="hint">Swipe / Arrow keys</div>
-      </div>
-    </div>
-  </div>
+<div id="viewer">
+    <img id="image" />
+</div>
+
+<div id="hint">Swipe / Arrow keys</div>
 
 <script>
-(() => {
-  // Sets you care about
-  const SETS = ["base", "economy", "killer", "wanted", "legend"];
+const BASE_URL = "https://kalvx.github.io/highnoon/cards";
 
-  // ---- Base path fix (THIS is the GitHub Pages killer) ----
-  // Example:
-  //   Local:   http://127.0.0.1:8011/gallery.html  -> basePath = ""
-  //   Pages:   https://kalvx.github.io/highnoon/gallery.html -> basePath = "/highnoon"
-  function computeBasePath() {
-    const host = location.hostname.toLowerCase();
-    if (host.endsWith("github.io")) {
-      // /<repoName>/gallery.html
-      const parts = location.pathname.split("/").filter(Boolean);
-      // parts[0] should be repo name, e.g. "highnoon"
-      if (parts.length >= 1) return "/" + parts[0];
-    }
-    return "";
-  }
-  const BASE = computeBasePath();
+let images = [];
+let index = 0;
 
-  // Helper to make URLs that work everywhere
-  const u = (path) => `${BASE}/${path}`.replace(/\/+/g, "/");
+async function loadSet(name) {
+    document.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+    event.target.classList.add("active");
 
-  const tabsEl = document.getElementById("tabs");
-  const viewer = document.getElementById("viewer");
-  const statusEl = document.getElementById("status");
-  const filenameEl = document.getElementById("filename");
+    const listUrl = `https://raw.githubusercontent.com/kalvx/highnoon/main/cards/${name}/index.txt`;
 
-  const prevBtn = document.getElementById("prev");
-  const nextBtn = document.getElementById("next");
+    const res = await fetch(listUrl);
+    const text = await res.text();
 
-  let currentSet = "base";
-  let images = [];
-  let idx = 0;
+    images = text
+        .split("\n")
+        .map(f => f.trim())
+        .filter(f => f.endsWith(".png"))
+        .map(f => `${BASE_URL}/${name}/${f}`);
 
-  function setStatus(msg){ statusEl.textContent = msg; }
+    index = 0;
+    show();
+}
 
-  function cleanLines(text){
-    return text
-      .split(/\r?\n/)
-      .map(s => s.trim())
-      .filter(Boolean);
-  }
+function show() {
+    if (!images.length) return;
+    document.getElementById("image").src = images[index];
+}
 
-  async function tryFetchJsonList() {
-    // Prefer cards.json if present (you have it in the repo)
-    // Expected format: { "base": ["base/A.png", ...], "killer": [...] }
-    try {
-      const res = await fetch(u("cards.json"), { cache: "no-store" });
-      if (!res.ok) return null;
-      const data = await res.json();
-      return data;
-    } catch {
-      return null;
-    }
-  }
+document.addEventListener("keydown", e => {
+    if (!images.length) return;
+    if (e.key === "ArrowRight") index = (index + 1) % images.length;
+    if (e.key === "ArrowLeft") index = (index - 1 + images.length) % images.length;
+    show();
+});
 
-  async function loadFromIndexTxt(setName){
-    // Fallback: cards/<set>/index.txt
-    // Note: handle Legend vs legend folder name by trying both.
-    const candidates = [
-      `cards/${setName}/index.txt`,
-      `cards/${setName.toLowerCase()}/index.txt`,
-      `cards/${setName.toUpperCase()}/index.txt`,
-      `cards/${setName[0].toUpperCase()}${setName.slice(1).toLowerCase()}/index.txt`,
-      `cards/${setName[0].toUpperCase()}${setName.slice(1)}/index.txt`,
-      `cards/Legend/index.txt` // common case if you had "Legend" folder
-    ];
-
-    for (const p of candidates) {
-      try {
-        const res = await fetch(u(p), { cache: "no-store" });
-        if (!res.ok) continue;
-        const txt = await res.text();
-        const names = cleanLines(txt);
-        if (names.length) {
-          // names are filenames like "Annie_Oakley.png"
-          // build full image paths
-          const folderGuess = p.split("/").slice(0, -1).join("/"); // cards/<set>
-          return names.map(n => `${folderGuess}/${encodeURIComponent(n)}`);
-        }
-      } catch {}
-    }
-    return [];
-  }
-
-  async function loadSet(setName){
-    setStatus(`Loading ${setName}…`);
-
-    // 1) Try cards.json
-    const json = await tryFetchJsonList();
-    if (json && json[setName] && Array.isArray(json[setName]) && json[setName].length) {
-      images = json[setName].map(rel => `cards/${rel}`); // your json has "base/Annie.png"
-      idx = 0;
-      render();
-      setStatus(`${setName}: ${images.length} images`);
-      return;
-    }
-
-    // 2) Fallback to index.txt
-    images = await loadFromIndexTxt(setName);
-    idx = 0;
-    render();
-    setStatus(`${setName}: ${images.length} images (index.txt)`);
-  }
-
-  function render(){
-    if (!images.length){
-      viewer.removeAttribute("src");
-      viewer.alt = "no images";
-      filenameEl.textContent = `No images found for "${currentSet}"`;
-      return;
-    }
-    idx = (idx + images.length) % images.length;
-
-    const rel = images[idx];
-    const full = u(rel);
-
-    viewer.src = full;
-    filenameEl.textContent = rel.replace(/^cards\//, "");
-
-    // quick error signal if a single file 404s
-    viewer.onerror = () => {
-      filenameEl.textContent = `FAILED: ${rel}`;
-    };
-  }
-
-  function setActiveTab(){
-    [...tabsEl.querySelectorAll("button.tab")].forEach(b => {
-      b.classList.toggle("active", b.dataset.set === currentSet);
-    });
-  }
-
-  function makeTabs(){
-    tabsEl.innerHTML = "";
-    for (const s of SETS){
-      const b = document.createElement("button");
-      b.className = "tab";
-      b.textContent = s;
-      b.dataset.set = s;
-      b.onclick = async () => {
-        currentSet = s;
-        setActiveTab();
-        await loadSet(currentSet);
-      };
-      tabsEl.appendChild(b);
-    }
-    setActiveTab();
-  }
-
-  function next(){ if (images.length){ idx++; render(); } }
-  function prev(){ if (images.length){ idx--; render(); } }
-
-  // buttons
-  nextBtn.onclick = next;
-  prevBtn.onclick = prev;
-
-  // keyboard
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight") next();
-    if (e.key === "ArrowLeft") prev();
-  });
-
-  // swipe
-  let startX = null;
-  document.getElementById("stage").addEventListener("touchstart", (e) => {
-    if (!e.touches || !e.touches[0]) return;
-    startX = e.touches[0].clientX;
-  }, { passive:true });
-
-  document.getElementById("stage").addEventListener("touchend", (e) => {
-    if (startX === null) return;
-    const endX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : startX;
-    const dx = endX - startX;
-    startX = null;
-    if (Math.abs(dx) < 35) return;
-    if (dx < 0) next();
-    else prev();
-  }, { passive:true });
-
-  // init
-  makeTabs();
-  loadSet(currentSet);
-})();
+// auto-load first set
+loadSet("base");
 </script>
+
 </body>
 </html>
