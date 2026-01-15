@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>High Noon – Cardistry</title>
+
+<style>
+  body{
+    margin:0;
+    background: radial-gradient(#2b1a0f, #0f0703);
+    color:#e6c89c;
+    font-family: Georgia, serif;
+    overflow:hidden;
+  }
+
+  header{
+    padding: 10px;
+    text-align:center;
+    position: relative;
+    z-index: 5;
+  }
+
+  button{
+    background:#3a2617;
+    color:#e6c89c;
+    border:1px solid #6b4a2e;
+    padding:6px 12px;
+    margin:4px;
+    cursor:pointer;
+    border-radius:8px;
+    font-size: 13px;
+  }
+  button.active{ background:#6b4a2e; }
+
+  /* Viewer area */
+  #viewer{
+    position:absolute;
+    inset: 60px 0 0 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    touch-action: none; /* important for swipe in WebView */
+  }
+
+  #imgWrap{
+    position: relative;
+    width: min(92vw, 900px);
+    height: min(84vh, 980px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  #image{
+    max-width:100%;
+    max-height:100%;
+    border-radius:12px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+    -webkit-user-drag:none;
+    user-select:none;
+    pointer-events:none; /* swipe area is viewer */
+    background: rgba(0,0,0,0.10);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* Name overlay */
+  #nameOverlay{
+    position:absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.12);
+    font-size: 13px;
+    color: #f2e7d6;
+    max-width: 92%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events:none;
+  }
+
+  /* Set / index status */
+  #statusOverlay{
+    position:absolute;
+    bottom: 60px; /* sits above radio widget */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.40);
+    border: 1px solid rgba(255,255,255,0.10);
+    font-size: 12px;
+    opacity: .75;
+    pointer-events:none;
+  }
+
+  /* Mini radio widget (corner) */
+  #radioMini{
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 220px;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid #6b4a2e;
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: 0 0 18px rgba(0,0,0,0.7);
+    z-index: 10;
+  }
+
+  #radioTitle{
+    font-size: 11px;
+    opacity: .75;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #radioBtns{
+    display:flex;
+    gap:6px;
+    justify-content:center;
+  }
+
+  #radioBtns button{
+    padding: 6px 8px;
+    margin: 0;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  /* Hint */
+  #hint{
+    position:absolute;
+    bottom: 34px;
+    left: 10px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.30);
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 11px;
+    opacity:.6;
+    z-index: 10;
+    pointer-events:none;
+  }
+
+  @media (max-width: 420px){
+    #radioMini{ width: 200px; }
+    #radioBtns button{ font-size: 10px; padding: 6px 7px; }
+    #nameOverlay{ font-size: 12px; }
+  }
+</style>
+</head>
+
+<body>
+
+<header>
+  <button onclick="loadSet('base', this)">base</button>
+  <button onclick="loadSet('economy', this)">economy</button>
+  <button onclick="loadSet('killer', this)">killer</button>
+  <button onclick="loadSet('wanted', this)">wanted</button>
+</header>
+
+<div id="viewer">
+  <div id="imgWrap">
+    <div id="nameOverlay">—</div>
+    <img id="image" alt="gallery image" />
+    <div id="statusOverlay">Loading…</div>
+  </div>
+</div>
+
+<div id="hint">Swipe / Arrow keys • Music stays on</div>
+
+<!-- Mini Radio -->
+<div id="radioMini">
+  <div id="radioTitle">Radio: tap Play</div>
+  <div id="radioBtns">
+    <button onclick="playRadio()">Play</button>
+    <button onclick="nextRadio()">Next</button>
+    <button onclick="pauseRadio()">Pause</button>
+  </div>
+  <audio id="audio" preload="auto"></audio>
+</div>
+
+<script>
+/* --------------------- CONFIG --------------------- */
+/* Card images (same approach as your gallery.html) */
+const BASE_URL = "https://kalvx.github.io/highnoon/cards";
+
+/* Music files (same list as your radio.html) */
+const tracks = [
+  "music/card_shark.mp3",
+  "music/colorado.mp3",
+  "music/focus.mp3",
+  "music/ghost_town.mp3",
+  "music/whiskey_dust.mp3",
+  "music/whiskey_n_wildcards.mp3",
+  "music/whistling_pete.mp3"
+];
+
+/* --------------------- GALLERY --------------------- */
+let images = [];
+let index = 0;
+let activeSet = "base";
+
+const imgEl = document.getElementById("image");
+const nameOverlay = document.getElementById("nameOverlay");
+const statusOverlay = document.getElementById("statusOverlay");
+
+function filenameToNiceTitle(url){
+  // url ends with ".../Some_Name.png"
+  const last = String(url).split("/").pop() || "";
+  const noExt = last.replace(/\.(png|jpg|jpeg|webp)$/i, "");
+  const spaced = noExt.replace(/_/g, " ").replace(/\s+/g, " ").trim();
+
+  // Title Case (simple)
+  return spaced.split(" ").map(w => {
+    if (!w) return w;
+    return w.charAt(0).toUpperCase() + w.slice(1);
+  }).join(" ");
+}
+
+function show() {
+  if (!images.length) return;
+
+  const url = images[index];
+  imgEl.src = url;
+
+  nameOverlay.textContent = filenameToNiceTitle(url);
+  statusOverlay.textContent = `${activeSet} • ${index + 1}/${images.length}`;
+}
+
+function nextImg() {
+  if (!images.length) return;
+  index = (index + 1) % images.length;
+  show();
+}
+
+function prevImg() {
+  if (!images.length) return;
+  index = (index - 1 + images.length) % images.length;
+  show();
+}
+
+async function loadSet(name, btn) {
+  activeSet = name;
+
+  // highlight active button
+  document.querySelectorAll("header button").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+
+  statusOverlay.textContent = "Loading list…";
+
+  const listUrl = `https://raw.githubusercontent.com/kalvx/highnoon/main/cards/${name}/index.txt`;
+
+  const res = await fetch(listUrl);
+  const text = await res.text();
+
+  images = text
+    .split("\n")
+    .map(f => f.trim())
+    .filter(f => f.toLowerCase().endsWith(".png"))
+    .map(f => `${BASE_URL}/${name}/${f}`);
+
+  index = 0;
+  show();
+}
+
+/* Keyboard support */
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") nextImg();
+  if (e.key === "ArrowLeft") prevImg();
+});
+
+/* Swipe support (mobile/WebView) */
+const viewer = document.getElementById("viewer");
+let sx=0, sy=0, st=0;
+const MIN_DIST = 35, MAX_TIME = 700;
+
+viewer.addEventListener("touchstart", (e)=>{
+  const t = e.touches[0];
+  sx = t.clientX; sy = t.clientY; st = Date.now();
+}, {passive:false});
+
+viewer.addEventListener("touchmove", (e)=>{ e.preventDefault(); }, {passive:false});
+
+viewer.addEventListener("touchend", (e)=>{
+  if (!images.length) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - sx;
+  const dy = t.clientY - sy;
+  const dt = Date.now() - st;
+  if (dt > MAX_TIME) return;
+
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= MIN_DIST){
+    if (dx < 0) nextImg();
+    else prevImg();
+  }
+}, {passive:false});
+
+/* Auto load default set */
+loadSet("base");
+
+/* --------------------- RADIO --------------------- */
+const audio = document.getElementById("audio");
+const radioTitle = document.getElementById("radioTitle");
+let current = -1;
+
+function pickRandom(){
+  let i;
+  do { i = Math.floor(Math.random() * tracks.length); }
+  while (i === current && tracks.length > 1);
+  current = i;
+  audio.src = tracks[i];
+  radioTitle.textContent = "Radio: " + tracks[i].split("/").pop().replace(/_/g," ");
+}
+
+function playRadio(){
+  if (!audio.src) pickRandom();
+  audio.play().catch(() => {
+    radioTitle.textContent = "Radio: tap Play again";
+  });
+}
+
+function nextRadio(){
+  pickRandom();
+  audio.play().catch(()=>{});
+}
+
+function pauseRadio(){
+  audio.pause();
+  radioTitle.textContent = "Radio: paused";
+}
+
+audio.addEventListener("ended", ()=>{
+  pickRandom();
+  audio.play().catch(()=>{});
+});
+</script>
+
+</body>
+</html>
