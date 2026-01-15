@@ -1,0 +1,22 @@
+{
+  "name": "High Noon Cardistry",
+  "short_name": "Cardistry",
+  "start_url": "/highnoon/cardistry.html",
+  "display": "standalone",
+  "background_color": "#0f0703",
+  "theme_color": "#0f0703",
+  "icons": [
+    {
+      "src": "/highnoon/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/highnoon/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
