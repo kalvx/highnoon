@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>High Noon – Gallery</title>
+<style>
+  body {
+    margin: 0;
+    background: #0e0b07;
+    color: #f2e6c9;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    overflow: hidden;
+  }
+  header {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    background: #1b140c;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  header button {
+    background: #2b2114;
+    color: #f2e6c9;
+    border: 1px solid #4b3a22;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  header button.active { background: #6b4f2a; }
+
+  #viewer {
+    height: calc(100vh - 56px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    touch-action: none; /* prevents “weird scroll” */
+    position: relative;
+  }
+  #cardImg {
+    max-width: 92vw;
+    max-height: 92vh;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  #caption {
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    right: 12px;
+    font-size: 14px;
+    opacity: 0.85;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<header id="cats"></header>
+
+<div id="viewer">
+  <img id="cardImg" alt="card"/>
+  <div id="caption">
+    <div id="name"></div>
+    <div id="count"></div>
+  </div>
+</div>
+
+<script>
+let data = {};
+let currentCat = null;
+let index = 0;
+let startX = 0;
+
+const imgEl = document.getElementById('cardImg');
+const nameEl = document.getElementById('name');
+const countEl = document.getElementById('count');
+
+fetch('cards.json')
+  .then(r => r.json())
+  .then(json => {
+    data = json;
+    const cats = document.getElementById('cats');
+
+    Object.keys(data).forEach((cat, i) => {
+      const b = document.createElement('button');
+      b.textContent = cat;
+      b.onclick = () => loadCat(cat);
+      cats.appendChild(b);
+      if (i === 0) loadCat(cat);
+    });
+  });
+
+function loadCat(cat) {
+  currentCat = cat;
+  index = 0;
+
+  document.querySelectorAll('header button').forEach(b => {
+    b.classList.toggle('active', b.textContent === cat);
+  });
+
+  showCurrent();
+}
+
+function showCurrent() {
+  const list = data[currentCat] || [];
+  if (!list.length) {
+    imgEl.removeAttribute('src');
+    nameEl.textContent = `${currentCat} (no images)`;
+    countEl.textContent = '';
+    return;
+  }
+
+  const relPath = list[index];
+  imgEl.src = encodeURI(relPath);
+
+  // Nice display name (filename)
+  const file = relPath.split('/').pop();
+  nameEl.textContent = file.replace(/\.[^.]+$/, '');
+  countEl.textContent = `${index + 1} / ${list.length}`;
+}
+
+// Swipe handling
+const viewer = document.getElementById('viewer');
+
+viewer.addEventListener('touchstart', e => {
+  startX = e.touches[0].clientX;
+}, {passive: true});
+
+viewer.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - startX;
+  const list = data[currentCat] || [];
+
+  if (dx < -40 && index < list.length - 1) index++;
+  if (dx > 40 && index > 0) index--;
+
+  showCurrent();
+}, {passive: true});
+
+// Optional: tap right/left half to navigate (nice on phone)
+viewer.addEventListener('click', e => {
+  const list = data[currentCat] || [];
+  if (!list.length) return;
+
+  const mid = window.innerWidth / 2;
+  if (e.clientX > mid && index < list.length - 1) index++;
+  else if (e.clientX <= mid && index > 0) index--;
+
+  showCurrent();
+});
+</script>
+
+</body>
+</html>

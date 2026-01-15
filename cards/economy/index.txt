@@ -1,0 +1,12 @@
+﻿Arizona.png
+Bear.png
+Buffalo_Bill_Cody.png
+Cook.png
+Doc_Holliday.png
+Geronimo.png
+Horse.png
+Rancher.png
+Saloon_Girl.png
+Stagecoach_Driver.png
+Stampede.png
+Town_Drunk.png
