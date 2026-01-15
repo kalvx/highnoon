@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>High Noon Radio</title>
+
+<style>
+body {
+  margin: 0;
+  background: radial-gradient(#2b1a0f, #0f0703);
+  color: #e6c89c;
+  font-family: Georgia, serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.box {
+  background: rgba(0,0,0,0.45);
+  border: 1px solid #6b4a2e;
+  border-radius: 16px;
+  padding: 20px;
+  width: min(520px, 92vw);
+  text-align: center;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+}
+
+h1 {
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+
+p {
+  margin: 0 0 14px;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+button {
+  background: #3a2617;
+  color: #e6c89c;
+  border: 1px solid #6b4a2e;
+  padding: 10px 14px;
+  margin: 6px;
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.small {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+<div class="box">
+  <h1>High Noon Radio</h1>
+  <p>Tap Play to start a random track</p>
+
+  <audio id="audio"></audio>
+
+  <div>
+    <button onclick="play()">Play</button>
+    <button onclick="next()">Next</button>
+    <button onclick="pause()">Pause</button>
+  </div>
+
+  <div class="small" id="status"></div>
+</div>
+
+<script>
+const tracks = [
+  "music/card_shark.mp3",
+  "music/colorado.mp3",
+  "music/focus.mp3",
+  "music/ghost_town.mp3",
+  "music/whiskey_dust.mp3",
+  "music/whiskey_n_wildcards.mp3",
+  "music/whistling_pete.mp3"
+];
+
+const audio = document.getElementById("audio");
+const status = document.getElementById("status");
+
+let current = -1;
+
+function pickRandom() {
+  let i;
+  do {
+    i = Math.floor(Math.random() * tracks.length);
+  } while (i === current);
+  current = i;
+  audio.src = tracks[i];
+  status.textContent = "Playing: " + tracks[i].split("/").pop();
+}
+
+function play() {
+  if (!audio.src) pickRandom();
+  audio.play().catch(e => {
+    status.textContent = "Tap required to start audio";
+  });
+}
+
+function next() {
+  pickRandom();
+  audio.play();
+}
+
+function pause() {
+  audio.pause();
+  status.textContent = "Paused";
+}
+
+audio.addEventListener("ended", () => {
+  pickRandom();
+  audio.play();
+});
+</script>
+</body>
+</html>
