@@ -11,6 +11,7 @@ body {
     color: #e6c89c;
     font-family: Georgia, serif;
     overflow: hidden;
+    touch-action: pan-y;
 }
 
 header {
@@ -61,10 +62,10 @@ img {
 <body>
 
 <header>
-    <button onclick="loadSet('base')">base</button>
-    <button onclick="loadSet('economy')">economy</button>
-    <button onclick="loadSet('killer')">killer</button>
-    <button onclick="loadSet('wanted')">wanted</button>
+    <button onclick="loadSet('base', this)">base</button>
+    <button onclick="loadSet('economy', this)">economy</button>
+    <button onclick="loadSet('killer', this)">killer</button>
+    <button onclick="loadSet('wanted', this)">wanted</button>
 </header>
 
 <div id="viewer">
@@ -79,9 +80,11 @@ const BASE_URL = "https://kalvx.github.io/highnoon/cards";
 let images = [];
 let index = 0;
 
-async function loadSet(name) {
+/* ---------- IMAGE LOADING ---------- */
+
+async function loadSet(name, btn) {
     document.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-    event.target.classList.add("active");
+    if (btn) btn.classList.add("active");
 
     const listUrl = `https://raw.githubusercontent.com/kalvx/highnoon/main/cards/${name}/index.txt`;
 
@@ -103,14 +106,54 @@ function show() {
     document.getElementById("image").src = images[index];
 }
 
+/* ---------- KEYBOARD SUPPORT ---------- */
+
 document.addEventListener("keydown", e => {
     if (!images.length) return;
+
     if (e.key === "ArrowRight") index = (index + 1) % images.length;
     if (e.key === "ArrowLeft") index = (index - 1 + images.length) % images.length;
+
     show();
 });
 
-// auto-load first set
+/* ---------- TOUCH → ARROW SUPPORT (ANDROID) ---------- */
+
+let touchStartX = 0;
+let touchStartY = 0;
+let touchStartTime = 0;
+
+const SWIPE_DISTANCE = 40;
+const SWIPE_TIME = 600;
+
+document.addEventListener("touchstart", e => {
+    const t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    touchStartTime = Date.now();
+}, { passive: true });
+
+document.addEventListener("touchend", e => {
+    if (!images.length) return;
+
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    const dt = Date.now() - touchStartTime;
+
+    if (dt > SWIPE_TIME) return;
+
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_DISTANCE) {
+        if (dx > 0) {
+            index = (index - 1 + images.length) % images.length; // swipe right = previous
+        } else {
+            index = (index + 1) % images.length; // swipe left = next
+        }
+        show();
+    }
+});
+
+/* ---------- AUTO LOAD ---------- */
 loadSet("base");
 </script>
 
