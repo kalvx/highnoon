@@ -6,55 +6,60 @@
 
 <style>
 body {
-    margin: 0;
-    background: radial-gradient(#2b1a0f, #0f0703);
-    color: #e6c89c;
-    font-family: Georgia, serif;
-    overflow: hidden;
-    touch-action: pan-y;
+  margin: 0;
+  background: radial-gradient(#2b1a0f, #0f0703);
+  color: #e6c89c;
+  font-family: Georgia, serif;
+  overflow: hidden;
 }
 
 header {
-    padding: 10px;
-    text-align: center;
+  padding: 10px;
+  text-align: center;
 }
 
 button {
-    background: #3a2617;
-    color: #e6c89c;
-    border: 1px solid #6b4a2e;
-    padding: 6px 14px;
-    margin: 4px;
-    cursor: pointer;
-    border-radius: 6px;
+  background: #3a2617;
+  color: #e6c89c;
+  border: 1px solid #6b4a2e;
+  padding: 6px 14px;
+  margin: 4px;
+  cursor: pointer;
+  border-radius: 6px;
 }
 
-button.active {
-    background: #6b4a2e;
-}
+button.active { background: #6b4a2e; }
 
 #viewer {
-    position: absolute;
-    inset: 60px 0 0 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: absolute;
+  inset: 60px 0 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* IMPORTANT: tell mobile WebView we handle gestures ourselves */
+  touch-action: none;
 }
 
 img {
-    max-width: 90%;
-    max-height: 90%;
-    border-radius: 12px;
-    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+
+  /* prevent “image drag” / selection behavior */
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none; /* swipe area is viewer, not the image */
 }
 
 #hint {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
-    text-align: center;
-    opacity: 0.6;
-    font-size: 12px;
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  opacity: 0.6;
+  font-size: 12px;
 }
 </style>
 </head>
@@ -62,14 +67,14 @@ img {
 <body>
 
 <header>
-    <button onclick="loadSet('base', this)">base</button>
-    <button onclick="loadSet('economy', this)">economy</button>
-    <button onclick="loadSet('killer', this)">killer</button>
-    <button onclick="loadSet('wanted', this)">wanted</button>
+  <button onclick="loadSet('base', this)">base</button>
+  <button onclick="loadSet('economy', this)">economy</button>
+  <button onclick="loadSet('killer', this)">killer</button>
+  <button onclick="loadSet('wanted', this)">wanted</button>
 </header>
 
 <div id="viewer">
-    <img id="image" />
+  <img id="image" alt="gallery image" />
 </div>
 
 <div id="hint">Swipe / Arrow keys</div>
@@ -80,80 +85,84 @@ const BASE_URL = "https://kalvx.github.io/highnoon/cards";
 let images = [];
 let index = 0;
 
-/* ---------- IMAGE LOADING ---------- */
+function nextImg() {
+  if (!images.length) return;
+  index = (index + 1) % images.length;
+  show();
+}
+
+function prevImg() {
+  if (!images.length) return;
+  index = (index - 1 + images.length) % images.length;
+  show();
+}
 
 async function loadSet(name, btn) {
-    document.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-    if (btn) btn.classList.add("active");
+  document.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
 
-    const listUrl = `https://raw.githubusercontent.com/kalvx/highnoon/main/cards/${name}/index.txt`;
+  const listUrl = `https://raw.githubusercontent.com/kalvx/highnoon/main/cards/${name}/index.txt`;
+  const res = await fetch(listUrl);
+  const text = await res.text();
 
-    const res = await fetch(listUrl);
-    const text = await res.text();
+  images = text
+    .split("\n")
+    .map(f => f.trim())
+    .filter(f => f.endsWith(".png"))
+    .map(f => `${BASE_URL}/${name}/${f}`);
 
-    images = text
-        .split("\n")
-        .map(f => f.trim())
-        .filter(f => f.endsWith(".png"))
-        .map(f => `${BASE_URL}/${name}/${f}`);
-
-    index = 0;
-    show();
+  index = 0;
+  show();
 }
 
 function show() {
-    if (!images.length) return;
-    document.getElementById("image").src = images[index];
+  if (!images.length) return;
+  document.getElementById("image").src = images[index];
 }
 
-/* ---------- KEYBOARD SUPPORT ---------- */
-
+/* Keyboard support (desktop) */
 document.addEventListener("keydown", e => {
-    if (!images.length) return;
-
-    if (e.key === "ArrowRight") index = (index + 1) % images.length;
-    if (e.key === "ArrowLeft") index = (index - 1 + images.length) % images.length;
-
-    show();
+  if (e.key === "ArrowRight") nextImg();
+  if (e.key === "ArrowLeft") prevImg();
 });
 
-/* ---------- TOUCH → ARROW SUPPORT (ANDROID) ---------- */
+/* Swipe support (mobile / WebView) — capture on #viewer */
+const viewer = document.getElementById("viewer");
 
-let touchStartX = 0;
-let touchStartY = 0;
-let touchStartTime = 0;
+let sx = 0, sy = 0, st = 0;
+const MIN_DIST = 35;   // px
+const MAX_TIME = 700;  // ms
 
-const SWIPE_DISTANCE = 40;
-const SWIPE_TIME = 600;
+viewer.addEventListener("touchstart", (e) => {
+  const t = e.touches[0];
+  sx = t.clientX;
+  sy = t.clientY;
+  st = Date.now();
+}, { passive: false });
 
-document.addEventListener("touchstart", e => {
-    const t = e.touches[0];
-    touchStartX = t.clientX;
-    touchStartY = t.clientY;
-    touchStartTime = Date.now();
-}, { passive: true });
+viewer.addEventListener("touchmove", (e) => {
+  // stop scroll/gesture handling so touchend still fires consistently
+  e.preventDefault();
+}, { passive: false });
 
-document.addEventListener("touchend", e => {
-    if (!images.length) return;
+viewer.addEventListener("touchend", (e) => {
+  if (!images.length) return;
 
-    const t = e.changedTouches[0];
-    const dx = t.clientX - touchStartX;
-    const dy = t.clientY - touchStartY;
-    const dt = Date.now() - touchStartTime;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - sx;
+  const dy = t.clientY - sy;
+  const dt = Date.now() - st;
 
-    if (dt > SWIPE_TIME) return;
+  if (dt > MAX_TIME) return;
 
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_DISTANCE) {
-        if (dx > 0) {
-            index = (index - 1 + images.length) % images.length; // swipe right = previous
-        } else {
-            index = (index + 1) % images.length; // swipe left = next
-        }
-        show();
-    }
-});
+  // horizontal swipe only
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= MIN_DIST) {
+    if (dx < 0) nextImg();  // swipe left = next
+    else prevImg();         // swipe right = prev
+  }
+}, { passive: false });
 
-/* ---------- AUTO LOAD ---------- */
+/* auto-load first set */
 loadSet("base");
 </script>
 
