@@ -1,11 +1,371 @@
 ﻿<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="refresh" content="0; url=gallery.html">
-    <title>High Noon Gallery</title>
-  </head>
-  <body>
-    <a href="gallery.html">Open Gallery</a>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>High Noon — Destination Gallery</title>
+  <style>
+    :root{
+      --bg:#0b0a08;
+      --panel:#1a140e;
+      --panel2:#221a12;
+      --text:#f2e7d6;
+      --muted:#bda98a;
+      --accent:#caa36a;
+      --accent2:#8a6a3d;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background: radial-gradient(1200px 600px at 50% 0%, #2a1b10 0%, var(--bg) 60%);
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      overflow:hidden;
+    }
+
+    .topbar{
+      display:flex;
+      gap:10px;
+      padding:12px 12px 10px;
+      background: linear-gradient(to bottom, rgba(34,26,18,0.95), rgba(34,26,18,0.65));
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .pill{
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.20);
+      color:var(--text);
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:600;
+      cursor:pointer;
+      user-select:none;
+    }
+    .pill:hover{ border-color: rgba(202,163,106,0.6); }
+    .pill.active{
+      background: rgba(202,163,106,0.20);
+      border-color: rgba(202,163,106,0.85);
+      box-shadow: 0 0 0 2px rgba(202,163,106,0.10) inset;
+    }
+
+    .spacer{ flex:1; }
+
+    .status{
+      font-size:12px;
+      color:var(--muted);
+      padding:6px 10px;
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:999px;
+      background: rgba(0,0,0,0.18);
+      max-width: 55vw;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .stage{
+      height: calc(100vh - 56px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    .frame{
+      width:min(92vw, 720px);
+      height:min(84vh, 980px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    .imgwrap{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    img#cardImg{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      image-rendering:auto;
+      filter: drop-shadow(0 16px 30px rgba(0,0,0,0.55));
+      border-radius: 14px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .navBtn{
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      width:46px;
+      height:46px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.25);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      font-size:22px;
+      font-weight:900;
+    }
+    .navBtn:hover{ border-color: rgba(202,163,106,0.7); }
+    .navBtn.left{ left:-8px; }
+    .navBtn.right{ right:-8px; }
+
+    .footer{
+      position:absolute;
+      bottom:10px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:12px;
+      color:var(--muted);
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius:999px;
+      padding:6px 10px;
+      max-width: 92vw;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .hint{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: rgba(242,231,214,0.75);
+      font-weight:700;
+      text-align:center;
+      padding: 20px;
+    }
+
+    @media (max-width: 520px){
+      .navBtn.left{ left:10px; }
+      .navBtn.right{ right:10px; }
+      .frame{ width: 96vw; height: calc(100vh - 110px); }
+      .topbar{ padding:10px; }
+      .status{ max-width: 90vw; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar" id="topbar">
+    <!-- category pills inserted by JS -->
+    <div class="spacer"></div>
+    <div class="status" id="status">Loading cards.json…</div>
+  </div>
+
+  <div class="stage">
+    <div class="frame">
+      <div class="imgwrap">
+        <div class="hint" id="hint">Loading…</div>
+        <img id="cardImg" alt="card" style="display:none;" />
+      </div>
+
+      <div class="navBtn left" id="prevBtn" title="Prev">‹</div>
+      <div class="navBtn right" id="nextBtn" title="Next">›</div>
+
+      <div class="footer" id="footer">—</div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // IMPORTANT:
+  // Your repo layout should be:
+  // /gallery.html
+  // /cards.json
+  // /cards/base/*.png
+  // /cards/economy/*.png
+  // /cards/killer/*.png
+  // /cards/wanted/*.png
+  //
+  // cards.json should contain paths like "base/Annie_Oakley.png"
+  // (NOT "cards/base/Annie_Oakley.png")
+
+  const DATA_URL = "cards.json"; // relative to page
+  const IMG_ROOT = "cards/";     // folder containing category subfolders
+
+  const topbar = document.getElementById("topbar");
+  const status = document.getElementById("status");
+  const hint = document.getElementById("hint");
+  const imgEl = document.getElementById("cardImg");
+  const footer = document.getElementById("footer");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  let data = {};
+  let categories = [];
+  let activeCat = "";
+  let list = [];
+  let idx = 0;
+
+  function setStatus(msg){ status.textContent = msg; }
+  function setHint(msg){ hint.textContent = msg; hint.style.display = "flex"; }
+  function hideHint(){ hint.style.display = "none"; }
+
+  function normalizeCatKeys(obj){
+    // Force predictable ordering and lowercase keys while preserving original if needed
+    // (If your JSON already uses lowercase keys, great.)
+    const out = {};
+    for (const k of Object.keys(obj)){
+      out[k.toLowerCase()] = obj[k];
+    }
+    return out;
+  }
+
+  function makePill(cat){
+    const b = document.createElement("div");
+    b.className = "pill";
+    b.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+    b.addEventListener("click", () => setCategory(cat));
+    return b;
+  }
+
+  function renderPills(){
+    // Remove existing pills (keep spacer/status)
+    const keep = [ ...topbar.querySelectorAll(".spacer, .status") ];
+    topbar.innerHTML = "";
+    for (const cat of categories){
+      topbar.appendChild(makePill(cat));
+    }
+    for (const el of keep){
+      topbar.appendChild(el);
+    }
+    updateActivePill();
+  }
+
+  function updateActivePill(){
+    const pills = topbar.querySelectorAll(".pill");
+    pills.forEach(p => {
+      const label = p.textContent.toLowerCase();
+      p.classList.toggle("active", label === activeCat);
+    });
+  }
+
+  function safeTrim(s){
+    return String(s || "").replace(/\r/g, "").trim();
+  }
+
+  function buildImgUrl(relPath){
+    // relPath like "base/Annie_Oakley.png"
+    // final becomes "cards/base/Annie_Oakley.png"
+    return IMG_ROOT + safeTrim(relPath);
+  }
+
+  function showIndex(){
+    if (!list.length){
+      imgEl.style.display = "none";
+      setHint("No images found for this category.");
+      footer.textContent = "—";
+      return;
+    }
+
+    idx = (idx + list.length) % list.length;
+
+    const rel = safeTrim(list[idx]);
+    const url = buildImgUrl(rel);
+
+    setStatus(`${activeCat} • ${idx+1}/${list.length}`);
+    footer.textContent = rel;
+
+    imgEl.onload = () => {
+      hideHint();
+      imgEl.style.display = "block";
+    };
+    imgEl.onerror = () => {
+      // Show which file failed (super helpful on Pages)
+      imgEl.style.display = "none";
+      setHint(`Failed to load:\n${url}`);
+    };
+
+    // cache-buster for testing (remove later if you want)
+    imgEl.src = url + `?v=${Date.now()}`;
+  }
+
+  function setCategory(cat){
+    activeCat = cat;
+    updateActivePill();
+    idx = 0;
+
+    list = Array.isArray(data[cat]) ? data[cat] : [];
+    // If JSON contains "base/..." already, keep it.
+    // If JSON contains just filenames, we can fix it here.
+    // (We detect by checking for a slash.)
+    if (list.length && !String(list[0]).includes("/")){
+      list = list.map(name => `${cat}/${name}`);
+    }
+
+    showIndex();
+  }
+
+  function next(){ idx++; showIndex(); }
+  function prev(){ idx--; showIndex(); }
+
+  prevBtn.addEventListener("click", prev);
+  nextBtn.addEventListener("click", next);
+
+  // Swipe support
+  let startX = null;
+  document.addEventListener("touchstart", (e) => {
+    if (!e.touches || !e.touches.length) return;
+    startX = e.touches[0].clientX;
+  }, {passive:true});
+  document.addEventListener("touchend", (e) => {
+    if (startX === null) return;
+    const endX = (e.changedTouches && e.changedTouches.length) ? e.changedTouches[0].clientX : startX;
+    const dx = endX - startX;
+    startX = null;
+    if (Math.abs(dx) < 35) return;
+    if (dx < 0) next(); else prev();
+  }, {passive:true});
+
+  // Keyboard support
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") next();
+    if (e.key === "ArrowLeft") prev();
+  });
+
+  async function init(){
+    try{
+      setHint("Loading cards…");
+      const res = await fetch(DATA_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status} loading ${DATA_URL}`);
+      const json = await res.json();
+
+      data = normalizeCatKeys(json);
+      categories = Object.keys(data).sort(); // base/economy/killer/wanted...
+      if (!categories.length) throw new Error("cards.json had no categories.");
+
+      renderPills();
+      setCategory(categories.includes("base") ? "base" : categories[0]);
+      hideHint();
+    } catch (err){
+      imgEl.style.display = "none";
+      setHint("Could not load cards.json.\n\n" + err.message);
+      setStatus("Error");
+      footer.textContent = "—";
+    }
+  }
+
+  init();
+})();
+</script>
+
+</body>
 </html>

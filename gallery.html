@@ -1,128 +1,369 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>High Noon – Destination Gallery</title>
-<style>
-  body {
-    margin: 0;
-    background: #0e0b07;
-    color: #f2e6c9;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    overflow: hidden;
-  }
-  header {
-    display: flex;
-    gap: 8px;
-    padding: 10px;
-    background: #1b140c;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-  header button {
-    background: #2b2114;
-    color: #f2e6c9;
-    border: 1px solid #4b3a22;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  header button.active {
-    background: #6b4f2a;
-  }
-  #viewer {
-    height: calc(100vh - 56px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-  #strip {
-    display: flex;
-    height: 100%;
-    transition: transform 0.3s ease;
-  }
-  .card {
-    min-width: 100vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .card img {
-    max-width: 92%;
-    max-height: 92%;
-    object-fit: contain;
-    border-radius: 10px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>High Noon — Destination Gallery</title>
+  <style>
+    :root{
+      --bg1:#0b0705;
+      --bg2:#140c08;
+      --panel:#1b110c;
+      --bar:#2a1a12;
+      --btn:#3a2419;
+      --btn2:#4a2f21;
+      --text:#e7d7c7;
+      --muted:#b9a694;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 50% 0%, #26160f 0%, var(--bg1) 55%, #070403 100%);
+      color:var(--text);
+      overflow:hidden;
+    }
+    header{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 12px;
+      background: linear-gradient(180deg, rgba(60,36,25,.9), rgba(30,18,12,.9));
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .left{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .title{
+      font-weight:700;
+      letter-spacing:.3px;
+      margin-right:6px;
+      opacity:.95;
+    }
+    .tabs{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    button.tab{
+      border:1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, var(--btn2), var(--btn));
+      color:var(--text);
+      padding:7px 10px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      box-shadow: 0 4px 12px rgba(0,0,0,.25);
+    }
+    button.tab.active{
+      outline:2px solid rgba(231,215,199,.25);
+      filter:brightness(1.05);
+    }
+    .right{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .wrap{
+      height: calc(100vh - 54px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      position:relative;
+    }
+    .stage{
+      width:min(980px, 96vw);
+      height:min(92vh, 820px);
+      background: linear-gradient(180deg, rgba(30,18,12,.75), rgba(20,12,8,.55));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    img#viewer{
+      max-width: 96%;
+      max-height: 92%;
+      object-fit: contain;
+      image-rendering: auto;
+      filter: drop-shadow(0 12px 30px rgba(0,0,0,.55));
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+    .navBtn{
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      width:46px;
+      height:46px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(40,24,16,.65);
+      backdrop-filter: blur(6px);
+      color:var(--text);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:22px;
+    }
+    .navBtn:hover{ background: rgba(60,36,25,.75); }
+    .navBtn:active{ transform:translateY(-50%) scale(.98); }
+    #prev{ left:12px; }
+    #next{ right:12px; }
+
+    .footer{
+      position:absolute;
+      left:0; right:0; bottom:0;
+      padding:10px 12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.35));
+      pointer-events:none;
+    }
+    .pill{
+      pointer-events:none;
+      font-size:12px;
+      color:var(--muted);
+      background: rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.08);
+      padding:6px 10px;
+      border-radius:999px;
+      backdrop-filter: blur(6px);
+      max-width: 70%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .hint{
+      pointer-events:none;
+      font-size:12px;
+      color:rgba(231,215,199,.75);
+      opacity:.9;
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <div class="left">
+      <div class="title">High Noon Gallery</div>
+      <div class="tabs" id="tabs"></div>
+    </div>
+    <div class="right" id="status">Loading…</div>
+  </header>
 
-<header id="cats"></header>
-<div id="viewer">
-  <div id="strip"></div>
-</div>
+  <div class="wrap">
+    <div class="stage" id="stage">
+      <button class="navBtn" id="prev" title="Prev">&#x2039;</button>
+      <img id="viewer" alt="card" />
+      <button class="navBtn" id="next" title="Next">&#x203A;</button>
+
+      <div class="footer">
+        <div class="pill" id="filename">—</div>
+        <div class="hint">Swipe / Arrow keys</div>
+      </div>
+    </div>
+  </div>
 
 <script>
-let data = {};
-let currentCat = null;
-let index = 0;
-let startX = 0;
+(() => {
+  // Sets you care about
+  const SETS = ["base", "economy", "killer", "wanted", "legend"];
 
-fetch('cards.json')
-  .then(r => r.json())
-  .then(json => {
-    data = json;
-    const cats = document.getElementById('cats');
-    Object.keys(data).forEach((cat, i) => {
-      const b = document.createElement('button');
-      b.textContent = cat;
-      b.onclick = () => loadCat(cat);
-      cats.appendChild(b);
-      if (i === 0) loadCat(cat);
+  // ---- Base path fix (THIS is the GitHub Pages killer) ----
+  // Example:
+  //   Local:   http://127.0.0.1:8011/gallery.html  -> basePath = ""
+  //   Pages:   https://kalvx.github.io/highnoon/gallery.html -> basePath = "/highnoon"
+  function computeBasePath() {
+    const host = location.hostname.toLowerCase();
+    if (host.endsWith("github.io")) {
+      // /<repoName>/gallery.html
+      const parts = location.pathname.split("/").filter(Boolean);
+      // parts[0] should be repo name, e.g. "highnoon"
+      if (parts.length >= 1) return "/" + parts[0];
+    }
+    return "";
+  }
+  const BASE = computeBasePath();
+
+  // Helper to make URLs that work everywhere
+  const u = (path) => `${BASE}/${path}`.replace(/\/+/g, "/");
+
+  const tabsEl = document.getElementById("tabs");
+  const viewer = document.getElementById("viewer");
+  const statusEl = document.getElementById("status");
+  const filenameEl = document.getElementById("filename");
+
+  const prevBtn = document.getElementById("prev");
+  const nextBtn = document.getElementById("next");
+
+  let currentSet = "base";
+  let images = [];
+  let idx = 0;
+
+  function setStatus(msg){ statusEl.textContent = msg; }
+
+  function cleanLines(text){
+    return text
+      .split(/\r?\n/)
+      .map(s => s.trim())
+      .filter(Boolean);
+  }
+
+  async function tryFetchJsonList() {
+    // Prefer cards.json if present (you have it in the repo)
+    // Expected format: { "base": ["base/A.png", ...], "killer": [...] }
+    try {
+      const res = await fetch(u("cards.json"), { cache: "no-store" });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data;
+    } catch {
+      return null;
+    }
+  }
+
+  async function loadFromIndexTxt(setName){
+    // Fallback: cards/<set>/index.txt
+    // Note: handle Legend vs legend folder name by trying both.
+    const candidates = [
+      `cards/${setName}/index.txt`,
+      `cards/${setName.toLowerCase()}/index.txt`,
+      `cards/${setName.toUpperCase()}/index.txt`,
+      `cards/${setName[0].toUpperCase()}${setName.slice(1).toLowerCase()}/index.txt`,
+      `cards/${setName[0].toUpperCase()}${setName.slice(1)}/index.txt`,
+      `cards/Legend/index.txt` // common case if you had "Legend" folder
+    ];
+
+    for (const p of candidates) {
+      try {
+        const res = await fetch(u(p), { cache: "no-store" });
+        if (!res.ok) continue;
+        const txt = await res.text();
+        const names = cleanLines(txt);
+        if (names.length) {
+          // names are filenames like "Annie_Oakley.png"
+          // build full image paths
+          const folderGuess = p.split("/").slice(0, -1).join("/"); // cards/<set>
+          return names.map(n => `${folderGuess}/${encodeURIComponent(n)}`);
+        }
+      } catch {}
+    }
+    return [];
+  }
+
+  async function loadSet(setName){
+    setStatus(`Loading ${setName}…`);
+
+    // 1) Try cards.json
+    const json = await tryFetchJsonList();
+    if (json && json[setName] && Array.isArray(json[setName]) && json[setName].length) {
+      images = json[setName].map(rel => `cards/${rel}`); // your json has "base/Annie.png"
+      idx = 0;
+      render();
+      setStatus(`${setName}: ${images.length} images`);
+      return;
+    }
+
+    // 2) Fallback to index.txt
+    images = await loadFromIndexTxt(setName);
+    idx = 0;
+    render();
+    setStatus(`${setName}: ${images.length} images (index.txt)`);
+  }
+
+  function render(){
+    if (!images.length){
+      viewer.removeAttribute("src");
+      viewer.alt = "no images";
+      filenameEl.textContent = `No images found for "${currentSet}"`;
+      return;
+    }
+    idx = (idx + images.length) % images.length;
+
+    const rel = images[idx];
+    const full = u(rel);
+
+    viewer.src = full;
+    filenameEl.textContent = rel.replace(/^cards\//, "");
+
+    // quick error signal if a single file 404s
+    viewer.onerror = () => {
+      filenameEl.textContent = `FAILED: ${rel}`;
+    };
+  }
+
+  function setActiveTab(){
+    [...tabsEl.querySelectorAll("button.tab")].forEach(b => {
+      b.classList.toggle("active", b.dataset.set === currentSet);
     });
+  }
+
+  function makeTabs(){
+    tabsEl.innerHTML = "";
+    for (const s of SETS){
+      const b = document.createElement("button");
+      b.className = "tab";
+      b.textContent = s;
+      b.dataset.set = s;
+      b.onclick = async () => {
+        currentSet = s;
+        setActiveTab();
+        await loadSet(currentSet);
+      };
+      tabsEl.appendChild(b);
+    }
+    setActiveTab();
+  }
+
+  function next(){ if (images.length){ idx++; render(); } }
+  function prev(){ if (images.length){ idx--; render(); } }
+
+  // buttons
+  nextBtn.onclick = next;
+  prevBtn.onclick = prev;
+
+  // keyboard
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") next();
+    if (e.key === "ArrowLeft") prev();
   });
 
-function loadCat(cat) {
-  currentCat = cat;
-  index = 0;
-  document.querySelectorAll('header button').forEach(b => {
-    b.classList.toggle('active', b.textContent === cat);
-  });
-  const strip = document.getElementById('strip');
-  strip.innerHTML = '';
-  data[cat].forEach(path => {
-    const d = document.createElement('div');
-    d.className = 'card';
-    const img = document.createElement('img');
-    img.src = encodeURI(path);
-    d.appendChild(img);
-    strip.appendChild(d);
-  });
-  update();
-}
+  // swipe
+  let startX = null;
+  document.getElementById("stage").addEventListener("touchstart", (e) => {
+    if (!e.touches || !e.touches[0]) return;
+    startX = e.touches[0].clientX;
+  }, { passive:true });
 
-function update() {
-  document.getElementById('strip').style.transform =
-    `translateX(${-index * window.innerWidth}px)`;
-}
+  document.getElementById("stage").addEventListener("touchend", (e) => {
+    if (startX === null) return;
+    const endX = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX : startX;
+    const dx = endX - startX;
+    startX = null;
+    if (Math.abs(dx) < 35) return;
+    if (dx < 0) next();
+    else prev();
+  }, { passive:true });
 
-// Touch swipe
-document.getElementById('viewer').addEventListener('touchstart', e => {
-  startX = e.touches[0].clientX;
-});
-document.getElementById('viewer').addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - startX;
-  if (dx < -40 && index < data[currentCat].length - 1) index++;
-  if (dx > 40 && index > 0) index--;
-  update();
-});
-
-// Resize safety
-window.addEventListener('resize', update);
+  // init
+  makeTabs();
+  loadSet(currentSet);
+})();
 </script>
-
 </body>
 </html>
