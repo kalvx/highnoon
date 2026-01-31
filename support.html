@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Support Pseudo Suitfall</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- PayPal SDK -->
+  <script 
+    src="https://www.paypal.com/sdk/js?client-id=BAAwWnkUc_vDyVoP5KMa7lI4Aeotkyv3Yk_IX7HwrD19Kok0ELji9y8q0rdTZqRy3to9FO3xikP9nU5i3Y&components=hosted-buttons&enable-funding=venmo&currency=USD">
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 40px 16px;
+      background: radial-gradient(circle at top, #15192B, #0B0E18);
+      color: #ffffff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Helvetica, Arial, sans-serif;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.7);
+      max-width: 520px;
+      margin: 0 auto 28px;
+      line-height: 1.5;
+    }
+
+    .card {
+      max-width: 420px;
+      margin: 0 auto 32px;
+      padding: 24px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .email {
+      margin-top: 18px;
+      font-size: 14px;
+    }
+
+    .email a {
+      color: #7fd4ff;
+      text-decoration: none;
+    }
+
+    .email a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Pseudo Suitfall</h1>
+  <p>
+    Skill replaces luck, one card at a time.<br />
+    If you enjoy the game and want to support development, you can do so below.
+  </p>
+
+  <div class="card">
+    <div id="paypal-container-Z74JF8735QYKS"></div>
+
+    <script>
+      paypal.HostedButtons({
+        hostedButtonId: "Z74JF8735QYKS",
+      }).render("#paypal-container-Z74JF8735QYKS");
+    </script>
+
+    <div class="email">
+      Prefer email?<br />
+      <a href="mailto:thegreatkalboski@gmail.com?subject=Pseudo%20Suitfall%20Support">
+        High Noon &lt;thegreatkalboski@gmail.com&gt;
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    Thank you for playing.<br />
+    Every move teaches. Every mistake lingers.
+  </footer>
+</body>
+</html>
