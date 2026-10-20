@@ -2,5 +2,10 @@
   "androidCode": 9,
   "version": "0.7.2",
   "androidUrl": "https://github.com/kalvx/highnoon/releases/download/v0.7.2/HighNoonFrontier-v0.7.2.apk",
-  "publicUrl": ""
+  "publicUrl": "",
+  "windowsCode": 706,
+  "windowsVersion": "0.7.6",
+  "windowsUrl": "https://github.com/kalvx/highnoon/releases/download/v0.7.6/HighNoonFrontier-Setup-v0.7.6.exe",
+  "windowsSha256": "976531a79b38134ee370f4fbab99007d6b51f07a804b28e57bba76ed0caca1e7",
+  "windowsBytes": 452559884
 }
