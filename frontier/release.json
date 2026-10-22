@@ -1,0 +1,17 @@
+{
+  "version": "0.8.2",
+  "date": "2026-10-21",
+  "title": "Keep the next card a surprise.",
+  "windowsUrl": "https://github.com/kalvx/highnoon/releases/download/v0.8.2/HighNoonFrontier-Setup-v0.8.2.exe",
+  "windowsBytes": 464966192,
+  "androidUrl": "https://github.com/kalvx/highnoon/releases/download/v0.8.2/HighNoonFrontier-v0.8.2.apk",
+  "androidBytes": 449999579,
+  "changes": [
+    {"title":"Your collection, your cards.","text":"Owned cards only, with the Full Index removed."},
+    {"title":"Break the seal.","text":"Four original pack backs, one-card reveals, rarity effects and opening sounds."},
+    {"title":"A weekly frontier gift.","text":"Claim one free pack each week, whenever you’re ready."},
+    {"title":"Make extras count.","text":"Common duplicates sell for silver; color, foil and animated extras sell for gold. Your original card stays owned."},
+    {"title":"A cleaner showdown.","text":"Silver card-face captions removed; opponents shown by name."},
+    {"title":"One connected frontier.","text":"Windows and Android share online accounts and cross-platform Battles."}
+  ]
+}
