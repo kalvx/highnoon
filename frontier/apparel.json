@@ -1,1 +1,14 @@
-{"products":[]}
+{
+  "products": [
+    {
+      "name": "High Noon Trucker Hat",
+      "image": "assets/high-noon-hat.png",
+      "description": "Black mesh-back cap. Signature gold High Noon logo."
+    },
+    {
+      "name": "High Noon Hoodie",
+      "image": "assets/high-noon-hoodie.png",
+      "description": "Black pullover hoodie. Signature gold High Noon logo."
+    }
+  ]
+}

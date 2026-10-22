@@ -37,7 +37,7 @@ fetch('apparel.json',{cache:'no-cache',credentials:'omit'}).then(r=>r.json()).th
  for(const p of data.products){if(typeof p.image!=='string'||!/^assets\/[a-zA-Z0-9._-]+\.(png|jpg|webp)$/.test(p.image))continue;
   const article=document.createElement('article');article.className='product';const image=document.createElement('img');image.src=p.image;image.alt=p.name;image.loading='lazy';image.width=600;image.height=600;const title=document.createElement('h3');title.textContent=p.name;const description=document.createElement('p');description.textContent=p.description??'';article.append(image,title,description);
   let url;try{url=new URL(p.url);if(url.protocol!=='https:')url=null;}catch{}
-  if(url){const a=document.createElement('a');a.className='button gold';a.href=url.href;a.target='_blank';a.rel='noopener noreferrer';a.textContent=p.label??'VIEW APPAREL ↗';article.append(a);}else{const note=document.createElement('p');note.className='availability';note.textContent='SHOP DETAILS COMING SOON';article.append(note);}
+  if(url){const a=document.createElement('a');a.className='button gold';a.href=url.href;a.target='_blank';a.rel='noopener noreferrer';a.textContent=p.label??'VIEW APPAREL ↗';article.append(a);}else{const note=document.createElement('p');note.className='availability';note.textContent='COMING SOON';article.append(note);}
   grid.append(article);
  }
 }).catch(()=>{});
