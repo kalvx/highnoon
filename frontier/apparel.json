@@ -3,12 +3,18 @@
     {
       "name": "High Noon Trucker Hat",
       "image": "assets/high-noon-hat.png",
-      "description": "Black mesh-back cap. Signature gold High Noon logo."
+      "description": "Black mesh-back cap. Signature gold High Noon logo.",
+      "availability": "AVAILABLE TO ORDER",
+      "url": "https://discord.gg/2nWZuMWYj",
+      "label": "REQUEST ON DISCORD ↗"
     },
     {
       "name": "High Noon Hoodie",
       "image": "assets/high-noon-hoodie.png",
-      "description": "Black pullover hoodie. Signature gold High Noon logo."
+      "description": "Black pullover hoodie. Signature gold High Noon logo.",
+      "availability": "AVAILABLE TO ORDER",
+      "url": "https://discord.gg/2nWZuMWYj",
+      "label": "REQUEST ON DISCORD ↗"
     }
   ]
 }
